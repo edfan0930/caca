@@ -49,3 +49,33 @@ func (c *config) Enforce(rvals ...interface{}) (b bool, err error) {
 	b, err = e.EnforceSafe(rvals...)
 	return
 }
+
+func (c *config) AddPolicy(rvals ...interface{}) (b bool, err error) {
+	e, err := casbin.NewEnforcerSafe(c.CONF, c.Adapter)
+	if err != nil {
+		return
+	}
+
+	err = e.LoadPolicy()
+	if err != nil {
+		return
+	}
+
+	b, err = e.AddPolicySafe(rvals...)
+	return
+}
+
+func (c *config) RemovePolicy(rvals ...interface{}) (b bool, err error) {
+	e, err := casbin.NewEnforcerSafe(c.CONF, c.Adapter)
+	if err != nil {
+		return
+	}
+
+	err = e.LoadPolicy()
+	if err != nil {
+		return
+	}
+
+	b, err = e.RemovePolicySafe(rvals...)
+	return
+}
