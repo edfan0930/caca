@@ -35,6 +35,7 @@ func NewConfig(u string) *config {
 	}
 }
 
+//check permission
 func (c *config) Enforce(rvals ...interface{}) (b bool, err error) {
 	e, err := casbin.NewEnforcerSafe(c.CONF, c.Adapter)
 	if err != nil {
@@ -50,6 +51,7 @@ func (c *config) Enforce(rvals ...interface{}) (b bool, err error) {
 	return
 }
 
+//add policy
 func (c *config) AddPolicy(rvals ...interface{}) (b bool, err error) {
 	e, err := casbin.NewEnforcerSafe(c.CONF, c.Adapter)
 	if err != nil {
@@ -65,6 +67,7 @@ func (c *config) AddPolicy(rvals ...interface{}) (b bool, err error) {
 	return
 }
 
+//remove policy
 func (c *config) RemovePolicy(rvals ...interface{}) (b bool, err error) {
 	e, err := casbin.NewEnforcerSafe(c.CONF, c.Adapter)
 	if err != nil {
