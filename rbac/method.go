@@ -1,9 +1,12 @@
 package rbac
 
 import (
+	"errors"
+
 	"github.com/casbin/casbin"
 	"github.com/casbin/casbin/persist"
 	mongodbadapter "github.com/casbin/mongodb-adapter"
+	"gopkg.in/mgo.v2/bson"
 )
 
 var url string
@@ -42,7 +45,8 @@ func (c *config) Enforce(rvals ...interface{}) (b bool, err error) {
 		return
 	}
 
-	err = e.LoadPolicy()
+	filter := &bson.M{"v0": rvals[0]}
+	e.LoadFilteredPolicy(filter)
 	if err != nil {
 		return
 	}
@@ -58,12 +62,18 @@ func (c *config) AddPolicy(rvals ...interface{}) (b bool, err error) {
 		return
 	}
 
-	err = e.LoadPolicy()
+	filter := &bson.M{"v0": rvals[0]}
+	e.LoadFilteredPolicy(filter)
 	if err != nil {
 		return
 	}
 
 	b, err = e.AddPolicySafe(rvals...)
+	if !b && err == nil {
+		if g := e.HasPolicy(rvals...); g {
+			err = errors.New("already exists")
+		}
+	}
 	return
 }
 
@@ -74,11 +84,90 @@ func (c *config) RemovePolicy(rvals ...interface{}) (b bool, err error) {
 		return
 	}
 
-	err = e.LoadPolicy()
+	filter := &bson.M{"v0": rvals[0]}
+	e.LoadFilteredPolicy(filter)
 	if err != nil {
 		return
 	}
 
 	b, err = e.RemovePolicySafe(rvals...)
+	return
+}
+
+//Add Group Policy
+func (c *config) AddGroupPolicy(rvals ...interface{}) (b bool, err error) {
+	e, err := casbin.NewEnforcerSafe(c.CONF, c.Adapter)
+	if err != nil {
+		return
+	}
+
+	filter := &bson.M{"v0": rvals[0]}
+	e.LoadFilteredPolicy(filter)
+	if err != nil {
+		return
+	}
+
+	b = e.AddGroupingPolicy(rvals...)
+	if !b {
+		if g := e.HasGroupingPolicy(rvals...); g {
+			err = errors.New("already exists")
+		}
+	}
+
+	return
+}
+
+//Remove Group Plicy
+//Not removed return false
+func (c *config) RemoveGroupPolicy(rvals ...interface{}) (b bool, err error) {
+	e, err := casbin.NewEnforcerSafe(c.CONF, c.Adapter)
+	if err != nil {
+		return
+	}
+
+	filter := &bson.M{"v0": rvals[0]}
+	e.LoadFilteredPolicy(filter)
+	if err != nil {
+		return
+	}
+
+	b = e.RemoveGroupingPolicy(rvals...)
+
+	return
+}
+
+//Policy exist return true
+func (c *config) HasPolicy(rvals ...interface{}) (b bool, err error) {
+	e, err := casbin.NewEnforcerSafe(c.CONF, c.Adapter)
+	if err != nil {
+		return
+	}
+
+	filter := &bson.M{"v0": rvals[0]}
+	e.LoadFilteredPolicy(filter)
+	if err != nil {
+		return
+	}
+
+	b = e.HasPolicy(rvals...)
+
+	return
+}
+
+//Group Policy exist return true
+func (c *config) HasGroupPolicy(rvals ...interface{}) (b bool, err error) {
+	e, err := casbin.NewEnforcerSafe(c.CONF, c.Adapter)
+	if err != nil {
+		return
+	}
+
+	filter := &bson.M{"v0": rvals[0]}
+	e.LoadFilteredPolicy(filter)
+	if err != nil {
+		return
+	}
+
+	b = e.HasGroupingPolicy(rvals...)
+
 	return
 }
