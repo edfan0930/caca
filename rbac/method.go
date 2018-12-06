@@ -39,8 +39,13 @@ func (c *config) Enforce(rvals ...interface{}) (b bool, err error) {
 	if err != nil {
 		return
 	}
-	//filter 身份
-	filter := &bson.M{"v0": rvals[0]}
+	//filter 條件為 ,
+	filter := &bson.M{
+		"$or": []interface{}{
+			bson.M{"v0": rvals[0]},
+			bson.M{"v1": rvals[1], "v2": rvals[2]},
+		},
+	}
 	e.LoadFilteredPolicy(filter)
 	if err != nil {
 		return
