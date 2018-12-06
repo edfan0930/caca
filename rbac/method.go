@@ -18,7 +18,7 @@ type (
 )
 
 // NewConfig --
-// mongodb://account:pass@localhost:27017/db
+// url example ,mongodb://account:pass@localhost:27017/db
 // default db name "casbin"
 func NewConfig(u string) *config {
 	//預設conf ,rbac_with_services_model.conf, 可直接覆蓋更換
