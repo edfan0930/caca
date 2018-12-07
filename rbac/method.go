@@ -39,7 +39,7 @@ func (c *config) Enforce(rvals ...interface{}) (b bool, err error) {
 	if err != nil {
 		return
 	}
-	//filter 條件為 ,
+	//filter 條件為 身份 or (services , path)
 	filter := &bson.M{
 		"$or": []interface{}{
 			bson.M{"v0": rvals[0]},
